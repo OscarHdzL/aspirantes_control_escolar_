@@ -1,0 +1,867 @@
+<ng-container>
+  <!--   <mat-toolbar class="example-header">Header</mat-toolbar> -->
+
+  <mat-sidenav-container class="example-container">
+    <mat-sidenav-content class="bg-pattern">
+      <vex-page-layout>
+
+
+        <div class="p-gutter m-10">
+          <div class="card overflow-hidden">
+            <div class="grid grid-cols-9 gap-4 mb-4">
+              <div class="col-start-3 col-span-5">
+                <img
+                  class="w-auto"
+                  src="assets/img/bannerENED_2.png"
+                />
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="row">
+              <h2 class=" px-8 py-6 title mb-0 mt-4">  A continuación llene el siguiente formulario.</h2>
+            </div>
+            <div class="row">
+              <mat-vertical-stepper
+                #verticalStepper="matVerticalStepper"
+                [linear]="true"
+              >
+                <ng-template matStepperIcon="edit">
+                  <mat-icon svgIcon="mat:done_all"></mat-icon>
+                </ng-template>
+
+                <ng-template matStepperIcon="done">
+                  <mat-icon svgIcon="mat:done_all"></mat-icon>
+                </ng-template>
+                <mat-step [stepControl]="FormularioNacionalidad">
+                  <form [formGroup]="FormularioNacionalidad">
+                    <ng-template matStepLabel>Nacionalidad</ng-template>
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Deporte</mat-label>
+                        <mat-select formControlName="deporte">
+                          <mat-option
+                            *ngFor="let deporte of listaDeportes"
+                            [value]="deporte.id"
+                            >{{ deporte.deporte }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioNacionalidad.get('deporte').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>País/Nacionalidad</mat-label>
+                        <input type="text"
+                          placeholder="Selecciona una opción"
+                          aria-label="Number"
+                          matInput
+                          formControlName="nacionalidad"
+                          [matAutocomplete]="auto">
+                    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                      <mat-option *ngFor="let nacionalidad of filteredOptions | async" [value]="nacionalidad.nombre">
+                        {{ nacionalidad.nombre }}
+                      </mat-option>
+                    </mat-autocomplete>
+                        <mat-error *ngIf="FormularioNacionalidad.get('nacionalidad').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto" *ngIf="!esMexicano">
+                        <mat-label>Tipo de documento nacionalidad</mat-label>
+                        <mat-select formControlName="tipodocumentonacionalidad">
+                          <mat-option
+                            *ngFor="let documento of listaTipoDocumentosNacionalidad"
+                            [value]="documento.id"
+                            >{{ documento.documento }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioNacionalidad.get('tipodocumentonacionalidad').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto" *ngIf="esMexicano">
+                        <mat-label>CURP</mat-label>
+                        <input
+                          formControlName="curp"
+                          matInput
+                          style="text-transform: uppercase"
+                        />
+                        <mat-error *ngIf="FormularioNacionalidad.get('curp').hasError('minlength')">Ingrese un curp válido</mat-error>
+                        <mat-error *ngIf="FormularioNacionalidad.get('curp').hasError('maxlength')">El CURP no puede tener más de 18 carácteres</mat-error>
+                        <mat-error *ngIf="FormularioNacionalidad.get('curp').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto" *ngIf="!esMexicano">
+                        <mat-label>Número de documento </mat-label>
+                        <input
+                          formControlName="numerodocumentonacionalidad"
+                          matInput
+                          style="text-transform: uppercase"
+                        />
+                        <mat-error *ngIf="FormularioNacionalidad.get('numerodocumentonacionalidad').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="columns" *ngIf="!esMexicano">
+                        <mat-label *ngIf="selectedFiles; else newFile">{{
+                          selectedFiles ? selectedFiles[0].name : ""
+                        }}</mat-label>
+                        <ng-template #newFile>
+                          <mat-label>Seleccionar archivo</mat-label>
+                        </ng-template>
+                        <input matInput disabled />
+                        <button
+                          mat-icon-button
+                          matSuffix
+                          (click)="fileInput.click()"
+                        >
+                          <mat-icon>attach_file</mat-icon>
+                        </button>
+                        <input
+                          hidden
+                          accept=".pdf"
+                          (change)="selectFile($event)"
+                          #fileInput
+                          type="file"
+                          id="file"
+                        />
+                      </mat-form-field>
+                    </div>
+
+                    <div class="actions flex items-center justify-end gap-2">
+                      <button
+                        [disabled]="
+                          FormularioNacionalidad.invalid ||
+                          (esMexicano ? esMexicano && !curpValido : false)
+                        "
+                        color="primary"
+                        mat-raised-button
+                        matStepperNext
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                  </form>
+                </mat-step>
+
+                <mat-step [stepControl]="FormularioDatosGenerales">
+                  <form [formGroup]="FormularioDatosGenerales">
+                    <ng-template matStepLabel>Datos generales</ng-template>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Nombre</mat-label>
+                        <input formControlName="nombre" matInput />
+                        <mat-error *ngIf="FormularioDatosGenerales.get('nombre').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Apellido paterno</mat-label>
+                        <input formControlName="paterno" matInput />
+                        <mat-error *ngIf="FormularioDatosGenerales.get('paterno').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Apellido materno</mat-label>
+                        <input formControlName="materno" matInput />
+
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Estado civil</mat-label>
+                        <mat-select formControlName="estadocivil">
+                          <mat-option
+                            *ngFor="let estadocivil of listaEstadoCivil"
+                            [value]="estadocivil.id"
+                            >{{ estadocivil.descripcion }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDatosGenerales.get('estadocivil').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Sexo</mat-label>
+                        <mat-select formControlName="sexo">
+                          <mat-option
+                            *ngFor="let sexo of listaSexos"
+                            [value]="sexo.catId"
+                            >{{ sexo.catName }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDatosGenerales.get('sexo').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Fecha nacimiento</mat-label>
+                        <input
+                          [matDatepicker]="datepickerRef"
+                          matInput
+                          formControlName="fechanacimiento"
+                        />
+                        <mat-datepicker-toggle
+                          [for]="datepickerRef"
+                          matSuffix
+                        ></mat-datepicker-toggle>
+                        <mat-datepicker
+                          #datepickerRef
+                          required
+                        ></mat-datepicker>
+                        <mat-error *ngIf="FormularioDatosGenerales.get('fechanacimiento').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Tipo sanguineo</mat-label>
+                        <mat-select formControlName="tiposanguineo">
+                          <mat-option
+                            *ngFor="let tiposanguineo of listaTipoSanguineo"
+                            [value]="tiposanguineo.id"
+                            >{{ tiposanguineo.tiposanguineo }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDatosGenerales.get('tiposanguineo').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Ingreso familiar</mat-label>
+                        <input  formControlName="ingresofamiliar" matInput currencyMask />
+
+                        <mat-error *ngIf="FormularioDatosGenerales.get('ingresofamiliar').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Seguridad Social</mat-label>
+                        <mat-select formControlName="seguridadsocial">
+                          <mat-option
+                            *ngFor="let seguridad of listaSeguridadSocial"
+                            [value]="seguridad.id"
+                            >{{ seguridad.catSeguridadSocial1 }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDatosGenerales.get('seguridadsocial').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Número Seguridad Social</mat-label>
+                        <input mask='00000000000' formControlName="numeroseguridadsocial" matInput />
+                        <mat-error *ngIf="FormularioDatosGenerales.get('numeroseguridadsocial').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="actions flex items-center justify-end gap-2">
+                      <button
+                        color="primary"
+                        mat-button
+                        matStepperPrevious
+                        type="button"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        [disabled]="FormularioDatosGenerales.invalid"
+                        color="primary"
+                        mat-raised-button
+                        matStepperNext
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                  </form>
+                </mat-step>
+
+                <mat-step [stepControl]="FormularioContacto">
+                  <form [formGroup]="FormularioContacto">
+                    <ng-template matStepLabel>Contacto</ng-template>
+                    <div class="actions flex items-center justify-start gap-2">
+                      <mat-hint style="font-style: italic;">Se requiere de al menos un correo y un télefono</mat-hint>
+                       </div>
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Tipo de contacto</mat-label>
+                        <mat-select formControlName="tipocontacto">
+                          <mat-option
+                            *ngFor="let tipocontacto of listaTipoContacto"
+                            [value]="tipocontacto.id"
+                            >{{ tipocontacto.tipo }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioContacto.get('tipocontacto').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Contacto</mat-label>
+                        <input formControlName="contacto" matInput />
+                        <mat-error *ngIf="FormularioContacto.get('contacto').hasError('required')">El campo es requerido</mat-error>
+                        <mat-error *ngIf="FormularioContacto.get('contacto').hasError('email')">Ingrese una dirección de correo válida, ya que se le enviará su acceso a la plataforma.</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Adicional</mat-label>
+                        <input formControlName="adicional" matInput />
+                        <mat-error *ngIf="FormularioContacto.get('adicional').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <button
+                        mat-icon-button
+                        matTooltip="Agregar contacto"
+                        [disabled]="FormularioContacto.invalid"
+                        (click)="agregarContacto()"
+                      >
+                        <mat-icon class="green-icon">add_circle</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="mt-4 mb-4">
+                      <table mat-table [dataSource]="dataSource" class="w-full" #tablaContacto>
+                        <ng-container matColumnDef="nombreContacto">
+                          <th mat-header-cell *matHeaderCellDef>
+                            Tipo Contacto.
+                          </th>
+                          <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="['text-secondary', 'font-medium']"
+                          >
+                            {{ element.nombreContacto }}
+                          </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="contacto">
+                          <th mat-header-cell *matHeaderCellDef>Contacto</th>
+                          <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="['font-medium']"
+                          >
+                            {{ element.contacto }}
+                          </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="adicional">
+                          <th mat-header-cell *matHeaderCellDef>Adicional</th>
+                          <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="['text-secondary', 'font-medium']"
+                          >
+                            {{ element.adicional }}
+                          </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="acciones">
+                          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                          <td
+                            mat-cell
+                            *matCellDef="let element"
+                            [ngClass]="['text-secondary', 'font-medium']"
+                          >
+                          <div class="flex">
+                            <a
+                              (click)="eliminarContacto(element)"
+                              matTooltip="Eliminar contacto"
+                              class="w-10 h-10 leading-none flex items-center justify-center ml-2 hover:bg-hover text-warn bg-primary/10"
+                              mat-icon-button
+                            >
+                              <mat-icon
+                                class="icon-sm"
+                                svgIcon="mat:delete"
+                              ></mat-icon>
+                            </a>
+                          </div>
+                          </td>
+                        </ng-container>
+
+                        <tr
+                          mat-header-row
+                          *matHeaderRowDef="displayedColumns"
+                        ></tr>
+                        <tr
+                          mat-row
+                          *matRowDef="let row; columns: displayedColumns"
+                        ></tr>
+                      </table>
+                    </div>
+
+
+                    <div class="actions flex items-center justify-end gap-2">
+                      <button
+                        color="primary"
+                        mat-button
+                        matStepperPrevious
+                        type="button"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        [disabled]="this.dataSource.length == 0"
+                        color="primary"
+                        mat-raised-button
+                        matStepperNext
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                  </form>
+                </mat-step>
+
+                <mat-step [stepControl]="FormularioDireccion">
+                  <form [formGroup]="FormularioDireccion">
+                    <ng-template matStepLabel>Dirección</ng-template>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Código postal</mat-label>
+                        <input  mask='00000' formControlName="codigopostal" matInput />
+                        <mat-error *ngIf="FormularioDireccion.get('codigopostal').hasError('required')">El campo es requerido</mat-error>
+                        <mat-error *ngIf="FormularioDireccion.get('codigopostal').hasError('pattern')">Introduzca un código postal válido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label >Estado</mat-label>
+                        <input formControlName="estado" matInput />
+                        <mat-error *ngIf="FormularioDireccion.get('estado').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+
+                      <!-- <mat-form-field class="flex-auto">
+                        <mat-label *ngIf="esMexicano">Estado</mat-label>
+                        <mat-select formControlName="estado">
+                          <mat-option
+                            *ngFor="let estado of listaEstados"
+                            [value]="estado"
+                            >{{ estado }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDireccion.get('estado').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field> -->
+
+
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Municipio</mat-label>
+                        <input formControlName="municipio" matInput />
+                        <mat-error *ngIf="FormularioDireccion.get('municipio').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto" *ngIf="!esMexicano">
+                        <mat-label>Colonia</mat-label>
+                        <input formControlName="colonia" matInput />
+                        <mat-error *ngIf="FormularioDireccion.get('colonia').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto" *ngIf="esMexicano">
+                        <mat-label>Colonia</mat-label>
+                        <mat-select formControlName="colonia">
+                          <mat-option
+                            *ngFor="let colonia of listaUbicacion"
+                            [value]="colonia.colonia"
+                            >{{ colonia.colonia }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDireccion.get('colonia').hasError('required')">El campo es requerido</mat-error>
+                        <mat-error *ngIf="FormularioDireccion.get('codigopostal').invalid">Por favor, introduzca un código postal primero</mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Calle</mat-label>
+                        <input formControlName="calle" matInput />
+                        <mat-error *ngIf="FormularioDireccion.get('calle').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>No. Exterior</mat-label>
+                        <input formControlName="noext" matInput />
+                        <mat-error *ngIf="FormularioDireccion.get('noext').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>No. Interior</mat-label>
+                        <input formControlName="noint" matInput />
+                        <mat-error *ngIf="FormularioDireccion.get('noint').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Referencias</mat-label>
+                        <textarea
+                          formControlName="referencias"
+                          matInput
+                        ></textarea>
+                        <mat-error *ngIf="FormularioDireccion.get('referencias').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="actions flex items-center justify-end gap-2">
+                      <button
+                        color="primary"
+                        mat-button
+                        matStepperPrevious
+                        type="button"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        [disabled]="FormularioDireccion.invalid"
+                        color="primary"
+                        mat-raised-button
+                        matStepperNext
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                  </form>
+                </mat-step>
+
+                <mat-step [stepControl]="FormularioEstudios">
+                  <form [formGroup]="FormularioEstudios">
+                    <ng-template matStepLabel>Estudios</ng-template>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Nombre Bachilleres</mat-label>
+                        <input formControlName="nombrebachiller" matInput />
+                        <mat-error *ngIf="FormularioEstudios.get('nombrebachiller').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Estado Bachilleres</mat-label>
+                        <mat-select formControlName="estadobachiller">
+                          <mat-option
+                            *ngFor="
+                              let estadobachilleres of listaEstadoBachilleres
+                            "
+                            [value]="estadobachilleres"
+                            >{{
+                              estadobachilleres
+                            }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioEstudios.get('estadobachiller').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Tipo certifica</mat-label>
+                        <mat-select formControlName="tipocertifica">
+                          <mat-option
+                            *ngFor="let tipocertifica of listaTipoCertificado"
+                            [value]="tipocertifica.id"
+                            >{{ tipocertifica.bachillerato }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioEstudios.get('tipocertifica').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Promedio final</mat-label>
+                        <input formControlName="promediofinal" matInput />
+                        <mat-error *ngIf="FormularioEstudios.get('promediofinal').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-label>¿Alguna licenciatura? </mat-label>
+                      <mat-radio-group
+                        class="flex gap-4"
+                        formControlName="tienelicenciatura"
+                      >
+                        <mat-radio-button [value]="true">Si</mat-radio-button>
+                        <mat-radio-button [value]="false">No</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+
+                    <div
+                      class="mt-4 flex flex-col lg:flex-row sm:gap-4"
+                      *ngIf="tieneLicenciatura"
+                    >
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Nombre licenciatura</mat-label>
+                        <input formControlName="nombrelicenciatura" matInput />
+                        <mat-error *ngIf="FormularioEstudios.get('nombrelicenciatura').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Estado licenciatura</mat-label>
+                        <mat-select formControlName="estadolicenciatura">
+                          <mat-option
+                            *ngFor="
+                              let estadolicenciatura of listaEstadoLicenciatura
+                            "
+                            [value]="estadolicenciatura"
+                            >{{
+                              estadolicenciatura
+                            }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioEstudios.get('estadolicenciatura').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Tiempo de practica deportiva</mat-label>
+                        <mat-select formControlName="tiempopractica">
+                          <mat-option
+                            *ngFor="let tiempopractica of listaTiemproPractica"
+                            [value]="tiempopractica.id"
+                            >{{ tiempopractica.rango }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioEstudios.get('tiempopractica').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Frecuencia</mat-label>
+                        <mat-select formControlName="frecuencia">
+                          <mat-option
+                            *ngFor="let frecuencia of listaFrecuencia"
+                            value="{{ frecuencia.id }}"
+                            >{{ frecuencia.frecuencia }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioEstudios.get('frecuencia').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Nivel alcanzado</mat-label>
+                        <mat-select formControlName="nivelalcanzado">
+                          <mat-option
+                            *ngFor="let nivelalcanzado of listaNivelAlcanzado"
+                            [value]="nivelalcanzado.id"
+                            >{{ nivelalcanzado.nivel }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioEstudios.get('nivelalcanzado').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Participando en</mat-label>
+                        <mat-select formControlName="participandoen">
+                          <mat-option
+                            *ngFor="let participando of listaParticipandoEn"
+                            [value]="participando.id"
+                            >{{ participando.participacion }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioEstudios.get('participandoen').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+
+                    <div class="actions flex items-center justify-end gap-2">
+                      <button
+                        color="primary"
+                        mat-button
+                        matStepperPrevious
+                        type="button"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        [disabled]="FormularioEstudios.invalid"
+                        color="primary"
+                        mat-raised-button
+                        matStepperNext
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                  </form>
+                </mat-step>
+
+                <mat-step [stepControl]="FormularioDiscapacidad">
+                  <form [formGroup]="FormularioDiscapacidad">
+                    <ng-template matStepLabel>Discapacidad</ng-template>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-label>¿Alguna discapacidad? </mat-label>
+                      <mat-radio-group
+                        class="flex gap-4"
+                        formControlName="tienediscapacidad"
+                      >
+                        <mat-radio-button [value]="true">Si</mat-radio-button>
+                        <mat-radio-button [value]="false">No</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+
+                    <div
+                      class="mt-4 flex flex-col lg:flex-row sm:gap-4"
+                      *ngIf="tieneDiscapacidad"
+                    >
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Tipo de discapacidad</mat-label>
+
+                        <mat-select formControlName="tipodiscapacidad">
+                          <mat-option
+                            *ngFor="
+                              let tipodiscapacidad of listaTipoDiscapacidad
+                            "
+                            [value]="tipodiscapacidad.id"
+                            >{{ tipodiscapacidad.discapacidad }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDiscapacidad.get('tipodiscapacidad').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Deporte en el que clasificó</mat-label>
+                        <mat-select formControlName="deporteclasifico">
+                          <mat-option
+                            *ngFor="
+                              let deporteclasifico of listaDeporteClasifico
+                            "
+                            [value]="deporteclasifico.id"
+                            >{{ deporteclasifico.deporte }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDiscapacidad.get('deporteclasifico').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Institución en la que clasificó</mat-label>
+                        <mat-select formControlName="institucionclasifico">
+                          <mat-option
+                            *ngFor="
+                              let InstitucionClasificoDiscapacidad of listaInstitucionClasificoDiscapacidad
+                            "
+                            [value]="InstitucionClasificoDiscapacidad.id"
+                            >{{
+                              InstitucionClasificoDiscapacidad.institucion
+                            }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDiscapacidad.get('institucionclasifico').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field class="flex-auto">
+                        <mat-label>Clasifico discapacidad</mat-label>
+                        <mat-select formControlName="clasificodiscapacidad">
+                          <!-- <mat-option
+                            *ngFor="
+                              let clasificodiscapacidad of this.listaClasificoDiscapacidad[0].catClasificacionDiscapacidads
+                            "
+                            [value]="clasificodiscapacidad.id"
+                            >{{
+                              clasificodiscapacidad.clasificacion
+                            }}</mat-option
+                          > -->
+                          <mat-option
+                            *ngFor="
+                              let clasificodiscapacidad of this.listaClasificoDiscapacidad
+                            "
+                            [value]="clasificodiscapacidad.id"
+                            >{{
+                              clasificodiscapacidad.clasificacion
+                            }}</mat-option
+                          >
+                        </mat-select>
+                        <mat-error *ngIf="FormularioDiscapacidad.get('clasificodiscapacidad').hasError('required')">El campo es requerido</mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="actions flex items-center justify-end gap-2">
+                      <button
+                        color="primary"
+                        mat-button
+                        matStepperPrevious
+                        type="button"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        [disabled]="FormularioDiscapacidad.invalid"
+                        color="primary"
+                        mat-raised-button
+                        matStepperNext
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                  </form>
+                </mat-step>
+
+                <mat-step [stepControl]="FormularioPoliticas">
+                  <form [formGroup]="FormularioPoliticas">
+                    <ng-template matStepLabel>Politicas</ng-template>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <mat-checkbox
+                        class="checkbox"
+                        formControlName="aceptapoliticas"
+                      >
+                        He leido las
+                        <a href="javascript:;"> Politicas de privacidad</a>
+                      </mat-checkbox>
+                    </div>
+
+                    <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+                      <re-captcha
+                        id="recaptcha"
+                        name="recaptcha"
+                        formControlName="token"
+                        [class.is-invalid]="
+                          FormularioPoliticas.get('token').invalid &&
+                          (FormularioPoliticas.get('token').dirty ||
+                            FormularioPoliticas.get('token').touched)
+                        "
+                      ></re-captcha>
+                    </div>
+
+                    <div class="actions flex items-center justify-end gap-2">
+                      <button
+                        color="primary"
+                        mat-button
+                        matStepperPrevious
+                        type="button"
+                      >
+                        Anterior
+                      </button>
+                      <button
+                        [disabled]="FormularioPoliticas.invalid"
+                        color="primary"
+                        mat-raised-button
+                        matStepperNext
+                        (click)="guardarPreregistro()"
+                      >
+                        Guardar Preregistro
+                      </button>
+                    </div>
+                  </form>
+                </mat-step>
+              </mat-vertical-stepper>
+            </div>
+          </div>
+        </div>
+
+        <br />
+        <div class="row">
+         <!--  {{this.FormularioDocumentos2.getRawValue()| json }}
+          <br />
+          {{ FormularioNacionalidad.getRawValue() | json }};
+          <br />
+          {{ FormularioDatosGenerales.getRawValue() | json }};
+          <br />
+          {{ this.dataSource | json }};
+          <br />
+          {{ FormularioContacto.getRawValue() | json }};
+          <br />
+          {{ FormularioDireccion.getRawValue() | json }};
+          <br />
+          {{ FormularioEstudios.getRawValue() | json }};
+          <br />
+          {{ FormularioDiscapacidad.getRawValue() | json }};
+          <br />
+          {{ FormularioPoliticas.getRawValue() | json }}; -->
+        </div>
+
+      </vex-page-layout>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+  <mat-toolbar class="example-footer">
+    <h3 class="footerCentrado">CONADE {{anio}} - Escuela Nacional de Entrenadores Deportivos </h3>
+    </mat-toolbar>
+</ng-container>

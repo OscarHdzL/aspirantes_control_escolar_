@@ -1,0 +1,248 @@
+<ng-container>
+
+
+  <mat-sidenav-container class="example-container">
+    <mat-sidenav-content>
+      <vex-page-layout>
+        <vex-page-layout-header class="pb-16 flex flex-col items-start justify-center">
+          <div [class.container]="layoutCtrl.value === 'boxed'" [class.px-gutter]="layoutCtrl.value === 'fullwidth'"
+            class="w-full flex flex-col sm:flex-row justify-between">
+            <div class="mt-4 flex flex-col lg:flex-row sm:gap-4">
+              <h2 class="title mt-6 mb-4 flex items-center">
+                <span class="w-10 h-10 rounded-full text-primary mr-3 flex items-center justify-center bg-primary/10">
+                  <mat-icon class="icon-sm" svgIcon="mat:vertical_split"></mat-icon>
+                </span>
+                <span class="block">Formulario dinamico</span>
+              </h2>
+            </div>
+          </div>
+        </vex-page-layout-header>
+
+        <vex-page-layout-content [class.container]="layoutCtrl.value === 'boxed'"
+          [class.px-gutter]="layoutCtrl.value === 'fullwidth'">
+          <div class="p-gutter container">
+            <div class="card overflow-hidden">
+              <div class="px-6 py-4 border-b flex items-center">
+                <h2 class="title m-0">Llene el siguiente formulario</h2>
+              </div>
+              <div class="card-body">
+
+                <div class="row">
+                  <!--   {{this.preguntas | json}} -->
+                </div>
+
+                <form #Formulario="ngForm">
+
+                  <div *ngFor="let pregunta of this.preguntas" style="margin-bottom: 10px;">
+                    <div>
+
+                      <div *ngIf="pregunta.tipoRespuesta === 'text'">
+
+                        <!-- CUANDO SI HAY PREGUNTA COMPLEMENTO -->
+                        <div class="mt-4 ml-4 mr-4 flex flex-col md:flex-row gap-2"
+                          *ngIf="pregunta.preguntaComplemento">
+
+                          <mat-form-field floatLabel="always" [appearance]="apariencia" class="basis-1/2">
+                            <mat-label>{{ pregunta.pregunta }} </mat-label>
+                            <input type="text" matInput maxlength="1000" name="inputPregunta1{{pregunta.id}}"
+                              [(ngModel)]="pregunta.respuesta.respuestaTexto"
+                              (ngModelChange)="onChangeTexto(pregunta,$event)"
+                              [required]="pregunta.respuestaObligatoria" />
+                          </mat-form-field>
+
+
+                          <mat-form-field floatLabel="always" [appearance]="apariencia" class="basis-1/2">
+                            <mat-label>{{ pregunta.preguntaComplemento }} </mat-label>
+                            <input type="text" matInput maxlength="1000" name="inputPregunta2{{pregunta.id}}"
+                              [(ngModel)]="pregunta.respuesta.respuestaComplemento"
+                              (ngModelChange)="onChangeTextoComplemento(pregunta,$event)"
+                              [required]="pregunta.respuestaComplementoObligatoria" />
+                          </mat-form-field>
+
+                        </div>
+
+                        <!-- CUANDO NO HAY PREGUNTA COMPLEMENTO -->
+                        <div class="mt-4 ml-4 mr-4 flex flex-col md:flex-row gap-2"
+                          *ngIf="!pregunta.preguntaComplemento">
+
+                          <mat-form-field floatLabel="always" [appearance]="apariencia" class="flex-auto">
+                            <mat-label>{{ pregunta.pregunta }} </mat-label>
+                            <input type="text" matInput maxlength="1000" name="inputPregunta3{{pregunta.id}}"
+                              [(ngModel)]="pregunta.respuesta.respuestaTexto"
+                              (ngModelChange)="onChangeTexto(pregunta,$event)"
+                              [required]="pregunta.respuestaObligatoria" />
+                          </mat-form-field>
+                        </div>
+
+                      </div>
+
+                      <div *ngIf="pregunta.tipoRespuesta == 'textarea'">
+
+                        <!-- CUANDO SI HAY PREGUNTA COMPLEMENTO -->
+                        <div class="mt-4 ml-4 mr-4 flex flex-col md:flex-row gap-2"
+                          *ngIf="pregunta.preguntaComplemento">
+                          <mat-form-field floatLabel="always" [appearance]="apariencia" class="basis-1/2">
+                            <mat-label>{{ pregunta.pregunta }} </mat-label>
+                            <textarea type="text" matInput maxlength="1000" name="inputPregunta5{{pregunta.id}}"
+                              [(ngModel)]="pregunta.respuesta.respuestaTexto"
+                              (ngModelChange)="onChangeTexto(pregunta,$event)"
+                              [required]="pregunta.respuestaObligatoria"></textarea>
+                          </mat-form-field>
+
+
+                          <mat-form-field floatLabel="always" [appearance]="apariencia" class="basis-1/2">
+                            <mat-label>{{ pregunta.preguntaComplemento }} </mat-label>
+                            <input type="text" matInput maxlength="1000" name="inputPregunta6{{pregunta.id}}"
+                              [(ngModel)]="pregunta.respuesta.respuestaComplemento"
+                              (ngModelChange)="onChangeTextoComplemento(pregunta,$event)"
+                              [required]="pregunta.respuestaComplementoObligatoria" />
+                          </mat-form-field>
+                        </div>
+
+                        <!-- CUANDO NO HAY PREGUNTA COMPLEMENTO -->
+
+
+                        <div class="mt-4 ml-4 mr-4 flex flex-col md:flex-row gap-2"
+                          *ngIf="!pregunta.preguntaComplemento">
+
+                          <mat-form-field floatLabel="always" [appearance]="apariencia" class="flex-auto">
+                            <mat-label>{{ pregunta.pregunta }} </mat-label>
+                            <textarea type="text" matInput maxlength="1000" name="inputPregunta7{{pregunta.id}}"
+                              [(ngModel)]="pregunta.respuesta.respuestaTexto"
+                              (ngModelChange)="onChangeTexto(pregunta,$event)"
+                              [required]="pregunta.respuestaObligatoria"></textarea>
+                          </mat-form-field>
+                        </div>
+                      </div>
+
+                      <div class="row" *ngIf="pregunta.tipoRespuesta == 'checkbox'">
+
+                        <div class="mt-4 ml-4 mr-4 flex-auto">
+                          <mat-label class="estilos-pregunta">{{pregunta.pregunta}} <span
+                            *ngIf="pregunta.respuestaObligatoria"> *</span></mat-label>
+                        </div>
+
+                        <div class="mt-4 ml-4 mr-4 flex-auto bordes-div">
+                          <div class=" grid grid-cols-1 sm:grid-cols-4 gap-4 ">
+                            <div class=" ml-4 mr-4" *ngFor="let opcion of pregunta.opciones">
+
+                              <mat-checkbox name="inputPreguntacheck{{pregunta.id + '_' + opcion.id}}"
+                                [(ngModel)]="opcion.checked" style="margin: 10px;" [value]="opcion.id.toString()"
+                                [checked]="opcion.checked" (change)="onCheckCheckbox(pregunta,opcion, $event)">
+                                {{opcion.opcion}}</mat-checkbox>
+                            </div>
+
+                          </div>
+                        </div>
+                        <br>
+                        <div class="mt-4 ml-4 mr-4 flex-auto">
+                          <!--  <small *ngIf="pregunta.respuestaObligatoria && pregunta.respuestas.length == 0"  class="text-danger"> Seleccione al menos una opción</small> -->
+                        </div>
+
+
+                      </div>
+                      <div class="row" *ngIf="pregunta.tipoRespuesta == 'radio'">
+                        <div class="mt-4 ml-4 mr-4 flex-auto">
+                          <mat-label class="estilos-pregunta">{{pregunta.pregunta}} <span
+                            *ngIf="pregunta.respuestaObligatoria"> *</span></mat-label>
+
+                        </div>
+                        <div class="mt-4 ml-4 mr-4 flex-auto bordes-div">
+                          <mat-radio-group class="flex gap-4" [(ngModel)]="pregunta.respuesta.tbl_Opciones_Pregunta_id"
+                            [required]="pregunta.respuestaObligatoria" name="radAnswer{{pregunta.id}}">
+
+                            <!--    -->
+                            <div class=" grid grid-cols-1 sm:grid-cols-4 gap-4 ">
+                              <div class="mt-4 ml-4 mr-4 mb-4" *ngFor="let opcion of pregunta.opciones">
+
+
+                                <mat-radio-button [value]="opcion.id" (change)="onCheckRadio(pregunta,opcion, $event)">
+                                  {{opcion.opcion}}</mat-radio-button>
+
+
+                              </div>
+
+                            </div>
+                          </mat-radio-group>
+                        </div>
+                        <br>
+                        <div class="mt-4 ml-4 mr-4 flex-auto">
+                          <!--  <small *ngIf="pregunta.respuestaObligatoria && pregunta.respuestas.length == 0"  class="text-danger"> Seleccione una opción</small> -->
+                        </div>
+
+
+
+
+
+                      </div>
+                      <div class="row" *ngIf="pregunta.tipoRespuesta == 'select'">
+
+                        <!--  <mat-form-field floatLabel="always"  [appearance]="apariencia" class="flex-auto">
+                          <mat-label>{{pregunta.pregunta}}</mat-label>
+                          <mat-select
+                          name="inputPregunta4{{pregunta.id}}" [(ngModel)]="pregunta.respuesta.tbl_Opciones_Pregunta_id" (valueChange)="onChangeDropDown(pregunta,$event)"  [style]="{'width':'100%'}" [required]="pregunta.respuestaObligatoria"
+                          >
+                            <mat-option
+                              *ngFor="let opcion of pregunta.opciones"
+                              [value]="opcion.id"
+                              >{{ opcion.opcion }}</mat-option
+                            >
+                          </mat-select>
+                        </mat-form-field> -->
+
+
+                        <div class="mt-4 ml-4 mr-4 flex flex-col md:flex-row gap-2"
+                          *ngIf="!pregunta.preguntaComplemento">
+
+                          <mat-form-field floatLabel="always" [appearance]="apariencia" class="flex-auto">
+                            <mat-label>{{ pregunta.pregunta }} </mat-label>
+                            <mat-select name="inputPregunta4{{pregunta.id}}"
+                              [(ngModel)]="pregunta.respuesta.tbl_Opciones_Pregunta_id"
+                              (valueChange)="onChangeDropDown(pregunta,$event)" [style]="{'width':'100%'}"
+                              [required]="pregunta.respuestaObligatoria">
+                              <mat-option *ngFor="let opcion of pregunta.opciones" [value]="opcion.id">{{ opcion.opcion
+                                }}</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- TERMINA INPUTS -->
+
+                  <!-- BOTON -->
+                  <br>
+
+                </form>
+
+                <div class="mt-4 ml-4 mr-4 flex items-center justify-end gap-2">
+                  <button color="primary" mat-raised-button type="button"
+                 [disabled]="Formulario.invalid || !checkboxesValidos()">Enviar
+                  respuestas</button>
+                </div>
+
+
+                <div class="row">
+                  {{this.preguntas  | json}}
+                </div>
+
+
+              </div>
+
+
+
+              <br>
+
+              <br /><br />
+              <div></div>
+              <!--TERMINA CONTENIDO -->
+            </div>
+          </div>
+        </vex-page-layout-content>
+      </vex-page-layout>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+  <!--
+    <mat-toolbar class="example-footer">Footer</mat-toolbar> -->
+</ng-container>

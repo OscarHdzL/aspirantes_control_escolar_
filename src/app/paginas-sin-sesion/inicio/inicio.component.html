@@ -1,0 +1,40 @@
+<ng-container>
+<!--     <mat-toolbar class="example-header">Header</mat-toolbar> -->
+
+  <mat-sidenav-container class="example-container bg-foreground">
+    <mat-sidenav-content>
+
+
+      <div class=" py-4 px-gutter">
+        <div class="grid grid-cols-9 gap-4">
+          <div class="col-start-3 col-span-5">
+            <img class="w-auto"  src="assets/img/bannerENED_2.png"  >
+          </div>
+        </div>
+        <br>
+        <br>
+        <h2 class="display-2 mt-0 mb-4 text-center"><b>Bienvenido</b></h2>
+        <h3 class="subheading-2 text-hint text-center max-w-lg mx-auto m-0">Por favor seleccione una opción</h3>
+
+        <div class="mt-16 max-w-3xl mx-auto flex flex-col md:flex-row">
+          <div class="text-center p-6 border-2 rounded md:w-1/2 md:mx-2 simularClick"  [routerLink]="['/preregistro-aspirante']">
+            <mat-icon class="text-hint icon-6xl" svgIcon="mat:assignment"></mat-icon>
+            <h3 class="title mb-0 mt-4">Ir al preregistro</h3>
+            <!-- <h4 class="subheading-2 m-0 text-hint">Call us anytime for a quick solution</h4> -->
+          </div>
+
+          <div class="text-center p-6 border rounded md:w-1/2 md:mx-2 simularClick"  [routerLink]="['/sesion-aspirante']">
+            <mat-icon class="text-hint icon-6xl" svgIcon="mat:input"></mat-icon>
+            <h3 class="title mb-0 mt-4">Soy aspirante</h3>
+            <h4 class="subheading-2 m-0 text-hint">Recibí mi usuario y contraseña por correo electrónico</h4>
+          </div>
+        </div>
+      </div>
+
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+    <mat-toolbar class="example-footer">
+    <h3 class="footerCentrado">CONADE {{anio}} - Escuela Nacional de Entrenadores Deportivos </h3>
+    </mat-toolbar>
+</ng-container>
