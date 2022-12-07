@@ -15,9 +15,10 @@ export class MainService {
   */
   //gatewayFormularioDinamico = 'https://localhost:7217/'
   urlServiciosJWT = 'https://localhost:7243/'
-  gatawayArchivos = 'http://10.10.0.32:8065/'
-  urlServicioControlEscolar = 'http://10.10.0.32:8056/Servicios/'
-  //urlServicioControlEscolar = 'https://localhost:7243/';
+  //gatawayArchivos = 'http://10.10.0.32:8065/'
+  gatawayArchivos = 'http://198.251.71.105:90/'
+  //urlServicioControlEscolar = 'http://10.10.0.32:8056/Servicios/'
+  urlServicioControlEscolar = 'https://localhost:7243/';
 
 
 //
